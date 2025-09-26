@@ -202,7 +202,7 @@ function highlightFilter(filter) {
 
         
 <center>
-<h1>Task1. Building Interactive Network of battles of the War of 5 Kings</h1>
+<h1></h1>
 </center>
 
 <!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
@@ -221,7 +221,7 @@ function highlightFilter(filter) {
 
 
         <center>
-          <h1>Task1. Building Interactive Network of battles of the War of 5 Kings</h1>
+          <h1></h1>
         </center>
         <style type="text/css">
 
@@ -282,8 +282,8 @@ function highlightFilter(filter) {
                   
 
                   // parsing and collecting nodes and edges from the python
-                  nodes = new vis.DataSet([{"color": "green", "font": {"color": "white"}, "id": "Mance Rayder", "label": "Mance Rayder", "shape": "dot", "value": 1}, {"color": "orange", "font": {"color": "white"}, "id": "Joffrey/Tommen Baratheon", "label": "Joffrey/Tommen Baratheon", "shape": "dot", "value": 2}, {"color": "green", "font": {"color": "white"}, "id": "Balon/Euron Greyjoy", "label": "Balon/Euron Greyjoy", "shape": "dot", "value": 1}, {"color": "purple", "font": {"color": "white"}, "id": "Robb Stark", "label": "Robb Stark", "shape": "dot", "value": 3}, {"color": "red", "font": {"color": "white"}, "id": "Stannis Baratheon", "label": "Stannis Baratheon", "shape": "dot", "value": 5}, {"color": "green", "font": {"color": "white"}, "id": "Renly Baratheon", "label": "Renly Baratheon", "shape": "dot", "value": 1}]);
-                  edges = new vis.DataSet([{"arrows": "to", "from": "Stannis Baratheon", "title": "Battle of Castle Black", "to": "Mance Rayder", "value": 1}, {"arrows": "to", "from": "Stannis Baratheon", "title": "Battle of the Blackwater, Siege of Winterfell", "to": "Joffrey/Tommen Baratheon", "value": 2}, {"arrows": "to", "from": "Stannis Baratheon", "title": "Siege of Storm\u0027s End", "to": "Renly Baratheon", "value": 1}, {"arrows": "to", "from": "Robb Stark", "title": "Battle of Torrhen\u0027s Square", "to": "Balon/Euron Greyjoy", "value": 1}, {"arrows": "to", "from": "Joffrey/Tommen Baratheon", "title": "Battle of the Golden Tooth, Battle of Riverrun, Sack of Winterfell, Battle of the Fords, The Red Wedding", "to": "Robb Stark", "value": 5}, {"arrows": "to", "from": "Stannis Baratheon", "title": "Retaking of Deepwood Motte", "to": "Balon/Euron Greyjoy", "value": 1}, {"arrows": "to", "from": "Robb Stark", "title": "Battle of the Green Fork, Battle of the Whispering Wood, Battle of the Camps, Battle of Oxcross, Sack of Harrenhal", "to": "Joffrey/Tommen Baratheon", "value": 5}]);
+                  nodes = new vis.DataSet([{"color": "red", "font": {"color": "white"}, "id": "Balon/Euron Greyjoy", "label": "Balon/Euron Greyjoy", "shape": "dot", "value": 4}, {"color": "red", "font": {"color": "white"}, "id": "Joffrey/Tommen Baratheon", "label": "Joffrey/Tommen Baratheon", "shape": "dot", "value": 4}, {"color": "green", "font": {"color": "white"}, "id": "Mance Rayder", "label": "Mance Rayder", "shape": "dot", "value": 1}, {"color": "green", "font": {"color": "white"}, "id": "Renly Baratheon", "label": "Renly Baratheon", "shape": "dot", "value": 1}, {"color": "purple", "font": {"color": "white"}, "id": "Robb Stark", "label": "Robb Stark", "shape": "dot", "value": 3}, {"color": "red", "font": {"color": "white"}, "id": "Stannis Baratheon", "label": "Stannis Baratheon", "shape": "dot", "value": 5}]);
+                  edges = new vis.DataSet([{"arrows": "to", "from": "Balon/Euron Greyjoy", "title": "Sack of Torrhen\u0027s Square", "to": "Balon/Euron Greyjoy", "value": 1}, {"arrows": "to", "from": "Balon/Euron Greyjoy", "title": "Battle of the Shield Islands, Invasion of Ryamsport, Vinetown, and Starfish Harbor", "to": "Joffrey/Tommen Baratheon", "value": 2}, {"arrows": "to", "from": "Balon/Euron Greyjoy", "title": "Battle of Moat Cailin, Battle of Deepwood Motte, Battle of the Stony Shore, Battle of Winterfell", "to": "Robb Stark", "value": 4}, {"arrows": "to", "from": "Joffrey/Tommen Baratheon", "title": "Fall of Moat Cailin", "to": "Balon/Euron Greyjoy", "value": 1}, {"arrows": "to", "from": "Joffrey/Tommen Baratheon", "title": "Battle of the Golden Tooth (att:15,000 vs def:4,000), Battle at the Mummer\u0027s Ford, Battle of Riverrun (att:15,000 vs def:10,000), Sack of Darry, Sack of Winterfell (att:618 vs def:2,000), Battle of the Fords (att:20,000 vs def:10,000), Battle of the Ruby Ford, The Red Wedding (att:3,500 vs def:3,500), Siege of Riverrun, Siege of Raventree", "to": "Robb Stark", "value": 10}, {"arrows": "to", "from": "Joffrey/Tommen Baratheon", "title": "Second Seige of Storm\u0027s End, Siege of Dragonstone", "to": "Stannis Baratheon", "value": 2}, {"arrows": "to", "from": "Robb Stark", "title": "Battle of Torrhen\u0027s Square (att:244 vs def:900)", "to": "Balon/Euron Greyjoy", "value": 1}, {"arrows": "to", "from": "Robb Stark", "title": "Battle of the Green Fork (att:18,000 vs def:20,000), Battle of the Whispering Wood (att:1,875 vs def:6,000), Battle of the Camps (att:6,000 vs def:12,625), Battle of Oxcross (att:6,000 vs def:10,000), Sack of Harrenhal (att:100 vs def:100), Battle of the Crag, Siege of Darry, Battle of Duskendale, Siege of Seagard", "to": "Joffrey/Tommen Baratheon", "value": 9}, {"arrows": "to", "from": "Stannis Baratheon", "title": "Retaking of Deepwood Motte (att:4,500 vs def:200)", "to": "Balon/Euron Greyjoy", "value": 1}, {"arrows": "to", "from": "Stannis Baratheon", "title": "Battle of the Blackwater (att:21,000 vs def:7,250), Siege of Winterfell (att:5,000 vs def:8,000)", "to": "Joffrey/Tommen Baratheon", "value": 2}, {"arrows": "to", "from": "Stannis Baratheon", "title": "Battle of Castle Black (att:100,000 vs def:1,240)", "to": "Mance Rayder", "value": 1}, {"arrows": "to", "from": "Stannis Baratheon", "title": "Siege of Storm\u0027s End (att:5,000 vs def:20,000)", "to": "Renly Baratheon", "value": 1}]);
 
                   nodeColors = {};
                   allNodes = nodes.get({ returnType: "Object" });
@@ -294,35 +294,7 @@ function highlightFilter(filter) {
                   // adding nodes and edges to the graph
                   data = {nodes: nodes, edges: edges};
 
-                  var options = {
-    "configure": {
-        "enabled": false
-    },
-    "edges": {
-        "color": {
-            "inherit": true
-        },
-        "smooth": {
-            "enabled": true,
-            "type": "dynamic"
-        }
-    },
-    "interaction": {
-        "dragNodes": true,
-        "hideEdgesOnDrag": false,
-        "hideNodesOnDrag": false
-    },
-    "physics": {
-        "enabled": true,
-        "stabilization": {
-            "enabled": true,
-            "fit": true,
-            "iterations": 1000,
-            "onlyDynamicEdges": false,
-            "updateInterval": 50
-        }
-    }
-};
+                  var options = {"edges": {"smooth": {"enabled": true, "type": "dynamic"}}, "physics": {"enabled": true, "stabilization": {"enabled": true, "iterations": 1000}}, "interaction": {"dragNodes": true, "hideEdgesOnDrag": false, "hideNodesOnDrag": false}};
 
                   
 
