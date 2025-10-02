@@ -1,122 +1,106 @@
 # Import dependencies
 import streamlit as st
-import streamlit.components.v1 as components #to display the HTML code
-
+import streamlit.components.v1 as components  # keep if you show HTML later
 from PIL import Image
 
-import random
-
 from src.trivialVacuumEnvironmentClass import TrivialVacuumEnvironment
-from src.agents import RandomVacuumAgent
+from src.agents import RandomVacuumAgent, TableDrivenVacuumAgent, ReflexAgent
 
-env1={(0, 0): 'Clean', (1, 0): 'Clean'}
-env2={(0, 0): 'Clean', (1, 0): 'Dirty'}
-env3={(0, 0): 'Dirty', (1, 0): 'Clean'}
-env4={(0, 0): 'Dirty', (1, 0): 'Dirty'}
+# ----- canonical env-state images -----
+env1 = {(0, 0): 'Clean', (1, 0): 'Clean'}
+env2 = {(0, 0): 'Clean', (1, 0): 'Dirty'}
+env3 = {(0, 0): 'Dirty', (1, 0): 'Clean'}
+env4 = {(0, 0): 'Dirty', (1, 0): 'Dirty'}
 
-
-
-def getImg (agentLoc, envState):
-    if agentLoc==(0,0):
-        if envState==env1:
-            # Load an image
-            image = Image.open("imgs/a_clean_Agent__b_clean.jpg") # Replace with your image path
-        elif envState==env2:
+def getImg(agentLoc, envState):
+    # Choose an image based on agent location and the two-room cleanliness.
+    # NOTE: dict equality compares by content, so this works.
+    if agentLoc == (0, 0):
+        if envState == env1:
+            image = Image.open("imgs/a_clean_Agent__b_clean.jpg")
+        elif envState == env2:
             image = Image.open("imgs/a_clean_Agent__b_dirty.jpg")
-        elif envState==env3:
+        elif envState == env3:
             image = Image.open("imgs/a_dirty_Agent__b_clean.jpg")
-        elif envState==env4:
-            image = Image.open("imgs/a_dirty_Agent__b_dirty.jpg")            
-
-    elif agentLoc==(1,0):
-        if envState==env1:
-            # Load an image
-            image = Image.open("imgs/a_clean__b_clean_Agent.jpg") # Replace with your image path
-        elif envState==env2:
+        else:  # env4
+            image = Image.open("imgs/a_dirty_Agent__b_dirty.jpg")
+    else:  # agentLoc == (1, 0)
+        if envState == env1:
+            image = Image.open("imgs/a_clean__b_clean_Agent.jpg")
+        elif envState == env2:
             image = Image.open("imgs/a_clean__b_dirty_Agent.jpg")
-        elif envState==env3:
+        elif envState == env3:
             image = Image.open("imgs/a_dirty__b_clean_Agent.jpg")
-        elif envState==env4:
+        else:  # env4
             image = Image.open("imgs/a_dirty__b_dirty_Agent.jpg")
-    
     return image
 
-def drawBtn(e,a):
-    option= [e,a]
-    st.button("Run One Agent's Step", on_click= AgentStep, args= [option])
-    
-def AgentStep(opt):
-    st.session_state["clicked"] = True
-    e,a= opt[0],opt[1]
-    
-    if e.is_agent_alive(a):
-        stepActs=e.step()
-        st.success(" Agent decided to do: {}.".format(",".join(stepActs)))
-        st.success("RandomVacuumAgent is located at {} now.".format(a.location))
-        st.info("Current Agent performance: {}.".format(a.performance))
-        st.info("State of the Environment: {}.".format(e.status))
-    else:
-        st.error("Agent in location {} and it is dead.".format(a.location))
-        
-    image=getImg(a.location, e.status)
+# ----- session state helpers -----
+AGENTS = {
+    "Random": RandomVacuumAgent,
+    "Table-Driven": TableDrivenVacuumAgent,
+    "Reflex": ReflexAgent,
+}
+
+def init_state(default_agent="Reflex"):
+    if "env" not in st.session_state:
+        st.session_state.env = TrivialVacuumEnvironment()
+    if "agent" not in st.session_state:
+        st.session_state.agent = AGENTS[default_agent]()
+        st.session_state.env.add_thing(st.session_state.agent)
+
+def reset_env(agent_name):
+    st.session_state.env = TrivialVacuumEnvironment()
+    st.session_state.agent = AGENTS[agent_name]()
+    st.session_state.env.add_thing(st.session_state.agent)
+
+# ----- one-step callback -----
+def AgentStep(*args, **kwargs):
+    env = st.session_state.env
+    agent = st.session_state.agent
+
+    # percept -> action
+    percept = env.percept(agent)
+    action = agent.program(percept)
+
+    # apply action
+    env.execute_action(agent, action)
+
+    # report + redraw
+    st.success(f"Agent decided to do: {action}.")
+    st.info(f"{type(agent).__name__} is located at {agent.location} now.")
+    st.info(f"Current Agent performance: {agent.performance}.")
+    st.info(f"State of the Environment: {env.status}.")
+
+    image = getImg(agent.location, env.status)
     st.image(image, caption="Agent is here", use_container_width=True)
 
-        
-    
-    
-
-        
-    
-
-
-
+# ----- streamlit app -----
 def main():
-        
-    if "clicked" not in st.session_state:
-        st.session_state["clicked"] = False
-        
-    if not st.session_state["clicked"]:
-        # Set header title
-        st.title('Simple Agents - lab2. Example1')
-        st.header("_Initial Env._", divider=True)
-        
-        a1=RandomVacuumAgent()
-        st.info(f"{a1} has the initial performance: {a1.performance}")
-        
-        e1 = TrivialVacuumEnvironment()
-        # Check the initial state of the environment
-        st.info("State of the Environment: {}.".format(e1.status))
-        
-        e1.add_thing(a1)
-        
-        image=getImg(a1.location, e1.status)  
-        st.info("Agent in location {}.".format(a1.location))
-            
-        st.image(image, caption="Agent is here", use_container_width=True)
-        
-        drawBtn(e1,a1)
-    
-            
-        
-    if st.session_state["clicked"]:
-        st.warning("Agent Step Done!")
-        
-    
-    
-    
-        
-        
-        
-                
-            
-    
-    
-    
-    
-    
-    
-if __name__ == '__main__':
-    main()
-    
-    
+    st.title("Simple Agents - lab2. Example1")
+    st.header("_Initial Env._", divider=True)
 
+    # choose agent + reset/new env
+    choice = st.selectbox("Pick agent type", list(AGENTS.keys()), index=2)
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Reset / New Environment"):
+            reset_env(choice)
+    # ensure state exists after potential reset
+    init_state(default_agent=choice)
+
+    # read current state
+    env = st.session_state.env
+    agent = st.session_state.agent
+
+    st.info(f"{type(agent).__name__} has the initial performance: {agent.performance}")
+    st.info(f"State of the Environment: {env.status}.")
+    st.info(f"Agent in location {agent.location}.")
+
+    image = getImg(agent.location, env.status)
+    st.image(image, caption="Agent is here", use_container_width=True)
+
+    st.button("Run one agent step", on_click=AgentStep, key="step_btn")
+
+if __name__ == "__main__":
+    main()
