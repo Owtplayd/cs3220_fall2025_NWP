@@ -56,7 +56,7 @@ def rule_match(state, rules):
 # with rules.py:a2proRules usage.
 def interpret_input_A2pro(percepts):
   """
-  The instructor demonstrates interpreting a list of percepts
+  I included a list of percepts
   into a label like 'Office manager', 'IT', 'Student', 'Clear', 'Last room'.
   Keep the exact behavior for Task 3. We provide a minimal version
   that mirrors the style from class; you will expand it in Task 3.

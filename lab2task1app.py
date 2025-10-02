@@ -59,7 +59,8 @@ def AgentStep(opt):
         st.error("Agent in location {} and it is dead.".format(a.location))
         
     image=getImg(a.location, e.status)
-    st.image(image, caption="Agent is here", width="content")
+    st.image(image, caption="Agent is here", use_column_width=True)
+
         
     
     
@@ -91,7 +92,7 @@ def main():
         image=getImg(a1.location, e1.status)  
         st.info("Agent in location {}.".format(a1.location))
             
-        st.image(image, caption="Agent is here", width="content")
+        st.image(image, caption="Agent is here", use_column_width=True)
         
         drawBtn(e1,a1)
     
