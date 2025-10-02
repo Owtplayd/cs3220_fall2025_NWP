@@ -9,64 +9,65 @@ from src.agentClass import Agent
 
 class Environment:
   def __init__(self):
+    # List of agents currently in the environment
     self.agents = []
 
+  # -----------------------------
+  # Perception / Action interface
+  # -----------------------------
   def percept(self, agent):
-    #Return the percept that the agent sees at this point. (Implement this in derived classes)
-    print("I don't know how to percept.")
+    # Return the percept that the agent sees at this point.
+    # Implement this in derived classes.
+    raise NotImplementedError("Environment.percept must be implemented by a subclass.")
 
   def execute_action(self, agent, action):
-    #Change the world to reflect this action. (Implement this in derived classes)
-    print("I don't know how to execute_action.")
+    # Apply the action to the world and update performance, etc.
+    # Implement this in derived classes.
+    raise NotImplementedError("Environment.execute_action must be implemented by a subclass.")
 
+  # -----------------------------
+  # Placement helpers
+  # -----------------------------
   def default_location(self, thing):
-    #Default location to place a new thing with unspecified location.
-    return None
-
-  def is_done(self):
-    #By default, we're done when we can't find a live agent.
-    
-    return not any(agent.is_alive() for agent in self.agents)
-
-  def step(self):
-        #Run the environment for one time step.
-        if not self.is_done():
-            actions = []
-            for agent in self.agents:
-                if agent.alive:
-                    #print(self.percept(agent))
-                    action=agent.program(self.percept(agent))
-                    print("Agent percepted {}.".format(self.percept(agent)))
-                    print("Agent decided to do {}.".format(action))
-                    actions.append(action)
-                else:
-                    print("Agent {} is dead.".format(agent))
-                    actions.append("")
-            for (agent, action) in zip(self.agents, actions):
-                self.execute_action(agent, action)
-        else:
-          print("There is no one here who could work...")
-        return actions
-
-  def run(self, steps=10):
-        #Run the Environment for given number of time steps.
-        for step in range(steps):
-            if self.is_done():
-                print("We can't find a live agent")
-                return
-            print("step {0}:".format(step+1))
-            self.step()
+    # Fallback start location. Concrete envs usually override this.
+    return (0, 0)
 
   def add_thing(self, thing, location=None):
-    #from agentClass import Agent
+    # Add an Agent (or Thing) into the environment at a given location.
+    # For Task 1 we only use Agents; Things come in Task 2.
     if thing in self.agents:
       print("Can't add the same agent twice")
-    else:
-      if isinstance(thing, Agent):
-        thing.performance = 0
-        thing.location = location if location is not None else self.default_location(thing)
-        self.agents.append(thing)
+      return
+    if isinstance(thing, Agent):
+      thing.performance = 0
+      thing.alive = True
+      thing.location = location if location is not None else self.default_location(thing)
+      self.agents.append(thing)
 
   def delete_thing(self, thing):
+    # Remove an Agent from the environment (Things in Task 2+)
     if thing in self.agents:
       self.agents.remove(thing)
+
+  # -----------------------------
+  # Simulation loop
+  # -----------------------------
+  def is_done(self):
+    # End when no agent is alive
+    return not any(getattr(a, "alive", True) for a in self.agents)
+
+  def step(self):
+    # One turn for every agent currently in the world
+    for agent in list(self.agents):
+      if not getattr(agent, "alive", True):
+        continue
+      percept = self.percept(agent)          # (location, status)
+      action = agent.program(percept)        # agent decides
+      self.execute_action(agent, action)     # env applies + updates performance/alive
+
+  def run(self, steps=10):
+    # Run for at most 'steps' iterations or until is_done()
+    for _ in range(steps):
+      if self.is_done():
+        break
+      self.step()
