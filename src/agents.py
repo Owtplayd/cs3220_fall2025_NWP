@@ -6,6 +6,9 @@ from src.rules import actionList
 from src.rules import table
 from src.rules import crazy_house_actions
 
+from src.rules_cat import feedingRules, cat_actions
+from src.foodClass import Food, Milk, Sausage
+
 """Randomly choose one of the actions from the vacuum environment"""
 
 
@@ -37,3 +40,33 @@ def RandomCrazyHouseCat(start_perf: int = 0, name: str = "Cat"):
     a = Agent(program=RandomAgentProgram(crazy_house_actions), name=name)
     a.performance = int(start_perf)
     return a
+
+
+# -------------------- Task 2: Cat-Friendly-House --------------------
+class AgentCat(Agent):
+    """
+    Cat that can eat Sausage and drink Milk.
+    Performance adjustments depend on food calories and weight.
+    Movement cost is handled by the Environment.
+    """
+
+    def __init__(self, program=None, name="Agent-Cat"):
+        super().__init__(program=program, name=name)
+
+    # You can tweak these methods to match your instructor's constants exactly.
+    # Default rule: delta = calories - weight
+    def eat(self, food: Food):
+        if isinstance(food, Sausage):
+            self.performance += food.calories - food.weight
+
+    def drink(self, food: Food):
+        if isinstance(food, Milk):
+            self.performance += food.calories - food.weight
+
+
+def TableDrivenCatAgent(name: str = "Agent-Cat") -> AgentCat:
+    """
+    Returns an Agent-Cat that follows the table-driven program using feedingRules.
+    """
+    prog = TableDrivenAgentProgram(feedingRules)
+    return AgentCat(program=prog, name=name)
