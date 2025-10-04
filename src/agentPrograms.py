@@ -1,76 +1,80 @@
+# src/agentPrograms.py
 import random
 
-'''An idea of Random Agent Program is to choose an action at random, ignoring all percepts'''
+# ---------------------------------------------------------------------
+# Random / Table-Driven / Reflex (vacuum example + general pattern)
+# ---------------------------------------------------------------------
+
+
 def RandomAgentProgram(actions):
-   return lambda percept: random.choice(actions)
+    """Ignore percepts; pick any action uniformly at random."""
+    if not actions:
+        raise ValueError("actions must be a non-empty list")
+    return lambda percept: random.choice(actions)
+
 
 def TableDrivenAgentProgram(table):
     """
-    This agent selects an action based on the percept sequence.
-    To customize it, provide as table a dictionary of all 
-    {percept_sequence:action} pairs.
+    Table-driven agent program. 'table' is a dict keyed by tuple(percepts_so_far).
+    We keep an internal list of percepts and cast it to a tuple for lookup.
+    Percepts are the environment outputs, e.g. (loc, status).
     """
     percepts = []
 
     def program(percept):
         percepts.append(percept)
-        #print(tuple(percepts))
-        action = table.get(tuple(percepts))
-        
-        if action is None:
-          print("Not such percept sequence in my table")
-
-        return action
+        key = tuple(percepts)  # e.g., ((loc_A,'Clean'), (loc_B,'Dirty'))
+        if key in table:
+            return table[key]
+        # Common teaching fallback: try last percept only if full history not in table
+        last_key = (percepts[-1],)
+        if last_key in table:
+            return table[last_key]
+        raise KeyError(f"Percept sequence {key} not found in the table.")
 
     return program
-  
-  
-def ReflexAgentProgram(rules,interpret_input,rule_match):
-  #This AP takes action based solely on the percept.
-    
+
+
+def ReflexAgentProgram(rules, interpret_input, rule_match):
+    """
+    Generic reflex agent:
+      abstract_state = interpret_input(percept)
+      action = rule_match(abstract_state, rules)
+    'rules' is typically a dict mapping abstract_state -> action.
+    """
+
     def program(percept):
         state = interpret_input(percept)
-        action = rule_match(state, rules)
-        return action
+        return rule_match(state, rules)
 
     return program
+
+
+# --- Helpers for your Task 1 vacuum world --------------------------------
 
 
 def interpret_input(percept):
-  loc, status = percept
-  return status
+    """
+    Your environment percept is (location, status), where:
+      location: loc_A or loc_B (likely (0,0) or (1,0))
+      status:   'Dirty' or 'Clean'
+    Your rules use keys like  ((0, 0), 'Dirty'), so just pass it through.
+    """
+    # e.g., percept == ( (0,0), 'Dirty' )
+    return percept
 
 
 def rule_match(state, rules):
-  for key in rules:
-    if state in key:
-      return rules[key]
+    """Strict dictionary lookup to align with your vacuumRules."""
+    return rules[state]
 
 
-
-
-#The code below -> for Task3 of the Assignment
-
+# --- (kept for later tasks; not used in Task 1) ---------------------------
 
 
 def interpret_input_A2pro(percept):
-  loc, percepts = percept
-  #print(percepts,loc, loc_D)
-  status='Clear'
-  if len(percepts)==0:
-    if loc==loc_D:
-      status='Last room'
-      #print(1)
-  else:
-    for p in percepts:
-      if isinstance(p, OfficeManager):
-        return 'Office manager'
-      elif isinstance(p, ITStuff):
-        return 'IT'
-      elif isinstance(p, Student):
-        return 'Student'
-  print(status)
-  return status
+    return percept
+
 
 def rule_match_A2pro(state, rules):
-  return rules[state]
+    return rules[state]

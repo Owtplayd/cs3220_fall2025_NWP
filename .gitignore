@@ -1,2 +1,17 @@
-# Ignore Python virtual environments
+# macOS
+.DS_Store
+
+# Python env & caches
 .venv/
+venv/
+**/.venv/
+**/venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Jupyter/Streamlit
+.ipynb_checkpoints/
+.streamlit/secrets.toml

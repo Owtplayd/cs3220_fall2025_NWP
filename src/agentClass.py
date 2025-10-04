@@ -1,29 +1,31 @@
-#This subclass of a base Thing class represents an Agent
-'''It has one required slot (attribute), .program, which reperesents Agent Program (the Core of Agent's logic).
-Agent Program should hold a function that takes one argument, the Percept, and returns an action.'''
+# src/agentClass.py
+# This subclass of a base Thing class represents an Agent.
+# It has one required slot .program (a function: percept -> action),
+# and an optional .performance numeric measure.
 
-'''!!! Note that '.program' is a slot, not a method.
-If it were a method, then the program could 'cheat' and look at aspects of the agent.
-It's not supposed to do that: the program can only look at the percepts'''
-
-'''
-There is an optional slot, .performance, which is a number giving
-the performance measure of the agent in its environment.'''
 from src.thingClass import Thing
 
-import collections #we need collections.abc which provides abstract base classes that can be used to test whether a class provides a particular interface
 
 class Agent(Thing):
+    """
+    Minimal Agent consistent with your course baseline:
+      - program: callable(percept) -> action
+      - performance: numeric score (default 0)
+      - location: set by Environment.add_thing / default_location
+      - alive: bool (default True)
+    """
 
-    def __init__(self, program=None):
-        self.alive = True
+    def __init__(self, program=None, name=None):
+        super().__init__()
+        self.name = name or "Agent"
+        self.program = program if callable(program) else (lambda percept: "NoOp")
         self.performance = 0
-        self.location=None
+        self.location = None
+        self.alive = True
 
-        if program is None or not isinstance(program, collections.abc.Callable):
-            print("Can't find a valid program for {}, falling back to default.".format(self.__class__.__name__))
+    def __call__(self, percept):
+        """Run the agent program: percept -> action."""
+        return self.program(percept)
 
-            def program(percept):
-                return eval(input('Percept={}; action? '.format(percept)))
-
-        self.program = program
+    def show_state(self):
+        print(f"{self.name}@{self.location} perf={self.performance} alive={self.alive}")
