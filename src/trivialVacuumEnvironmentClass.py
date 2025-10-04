@@ -1,50 +1,73 @@
+# src/trivialVacuumEnvironmentClass.py
 from src.environmentClass import Environment
-from src.locations import *
-
+from src.locations import loc_A, loc_B
+from src.agentClass import Agent
+from src.thingClass import Thing
 import random
 
+
 class TrivialVacuumEnvironment(Environment):
-  def __init__(self):
-    super().__init__()
-    self.status = {loc_A: random.choice(['Clean', 'Dirty']),
-                   loc_B: random.choice(['Clean', 'Dirty'])}
+    """
+    Two-location vacuum world (A and B).
+    State: dict {loc_A: 'Clean'|'Dirty', loc_B: 'Clean'|'Dirty'}
+    Percept to agent: (agent.location, status_at_location)
+    Actions: 'Left', 'Right', 'Suck', 'NoOp'
+    Rewards:
+      +10 for cleaning a dirty square with 'Suck'
+      -1  for moving (Left/Right) or for useless 'Suck' (already clean)
+       0  for 'NoOp'
+    """
 
-  def percept(self, agent):
-    #Returns the agent's location, and the location status (Dirty/Clean).
-    return agent.location, self.status[agent.location]
+    def __init__(self):
+        super().__init__()
+        self.status = {
+            loc_A: random.choice(["Clean", "Dirty"]),
+            loc_B: random.choice(["Clean", "Dirty"]),
+        }
 
-  def is_agent_alive(self, agent):
-    return agent.alive
+    # --- Agent I/O --------------------------------------------------------
+    def percept(self, agent: Agent):
+        """Return (agent.location, status_at_location)."""
+        return agent.location, self.status[agent.location]
 
-  def update_agent_alive(self, agent):
-    if agent.performance <= 0:
-      agent.alive = False
-      print("Agent {} is dead.".format(agent))
+    # --- Life/Housekeeping ------------------------------------------------
+    def is_agent_alive(self, agent: Agent):
+        return getattr(agent, "alive", True)
 
-  def execute_action(self, agent, action):
-    '''Check if agent alive, if so, execute action'''
-    if self.is_agent_alive(agent):
-        """Change agent's location and/or location's status;
-        Track performance.
-        Score 10 for each dirt cleaned; -1 for each move."""
+    def update_agent_alive(self, agent: Agent):
+        agent.alive = True  # Task 1 never terminates the agent
 
-        if action == 'Right':
-            agent.location = loc_B
+    # --- Action effects ---------------------------------------------------
+    def execute_action(self, agent: Agent, action: str):
+        if action == "Right":
+            if agent.location == loc_A:
+                agent.location = loc_B
             agent.performance -= 1
             self.update_agent_alive(agent)
-        elif action == 'Left':
-            agent.location = loc_A
+
+        elif action == "Left":
+            if agent.location == loc_B:
+                agent.location = loc_A
             agent.performance -= 1
             self.update_agent_alive(agent)
-        elif action == 'Suck':
-            if self.status[agent.location] == 'Dirty':
+
+        elif action == "Suck":
+            if self.status[agent.location] == "Dirty":
                 agent.performance += 10
-                self.status[agent.location] = 'Clean'
+                self.status[agent.location] = "Clean"
             else:
-              agent.performance -= 1
+                agent.performance -= 1
             self.update_agent_alive(agent)
 
-  def default_location(self, thing):
+        elif action == "NoOp":
+            # zero-cost idle in this baseline
+            self.update_agent_alive(agent)
+
+        else:
+            raise ValueError(f"Unknown action: {action}")
+
+    # --- Placement --------------------------------------------------------
+    def default_location(self, thing: Thing):
         """Agents start in either location at random."""
         print("Agent is starting in random location...")
         return random.choice([loc_A, loc_B])
