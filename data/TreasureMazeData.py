@@ -16,7 +16,6 @@ def undirected(d):
 
 # Nodes: S (start/entrance), E (exit), and internal junctions/corridors.
 # We only include real “decision points” and endpoints (start, exit, dead-ends),
-# exactly like the assignment asks.
 _raw = {
     "S": {"A1": 1},  # Entrance
     "A1": {"A2": 1, "B1": 1},
