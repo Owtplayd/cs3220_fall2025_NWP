@@ -34,6 +34,7 @@ class SimpleProblemSolvingAgentProgram:
                         self.goal.remove(goal)
                   self.state = temp
             else:
+                  print(f"Hi, I have the only goal: {goal}")
                   problem = self.formulate_problem(self.state, goal)
                   self.seq = self.search(problem)                 
                   

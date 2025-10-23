@@ -2,6 +2,12 @@ import numpy as np
 import math
 import random
 
+
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import seaborn as sns
+from matplotlib.colors import ListedColormap
+
 LEFT = 0
 UP = 1
 RIGHT = 2
@@ -17,10 +23,32 @@ actions_dict = {
 
 def makeMaze(n):
   size = (n,n)
-  proba_0 =0.2 # resulting array will have 30% of zeros
-  #proba_food =0.2 # resulting array will have 30% of zeros
-  arrMaze=np.random.choice([0, 1], size=size, p=[proba_0, 1-proba_0])
+  proba_0 =0.2 # resulting array will have 20% of zeros
+  proba_food =0.1 # resulting array will have 10% of food pellets
+  arrMaze=np.random.choice([0, 1,2], size=size, p=[proba_0, 1-proba_0-proba_food,proba_food])
   return arrMaze
+
+
+def draw_maze(maze):
+    fig, ax = plt.subplots()
+    colors = sns.color_palette('coolwarm', len(np.unique(maze)))
+    #print(colors)
+    cmap = ListedColormap(colors)
+    sns.heatmap(maze, cmap=cmap, annot=False, cbar=False)
+    for i in range(maze.shape[0]):
+      for j in range(maze.shape[1]):
+        rect=patches.Rectangle((j, i), 1, 1, fill=False, edgecolor='yellow', lw=2)
+        ax.add_patch(rect)
+        #plt.gca().add_patch(patches.Rectangle((j, i), 1, 1, fill=False, edgecolor='yellow', lw=2))
+        if i==0 and j==0:
+            rect=patches.Rectangle((j, i), 1, 1, fill=True, color='pink')
+            ax.add_patch(rect)
+        if i==maze.shape[0]-1 and j==maze.shape[1]-1:
+            rect=patches.Rectangle((j, i), 1, 1, fill=True, color='green')
+            ax.add_patch(rect)
+
+    plt.show()
+
 
 
 def defineMazeActions(arr):
@@ -197,8 +225,8 @@ def mazeStatesLocations(keyList):
   y = []
   
   for elem in keyList:
-    x.append(elem[1]*50)
-    y.append(elem[0]*50)
+    x.append(elem[1]*100)
+    y.append(elem[0]*100)
  
   zipped = zip(x, y)
   return dict(zip(keyList, zipped))
