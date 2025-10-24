@@ -1,4 +1,4 @@
-#!/Users/saucysenpai/Documents/NWP/FALL_2025/CS3220_AI_Hannah/Ai_Ass5/.venv/bin/python
+#!/Users/saucysenpai/Documents/NWP/FALL_2025/CS3220_AI_Hannah/Ai_Ass5/.venv/bin/python3.13
 # -*- coding: utf-8 -*-
 import re
 import sys
