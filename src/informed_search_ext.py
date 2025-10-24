@@ -1,11 +1,11 @@
 # src/informed_search_ext.py
 # ---------------------------------------------------------------------
 # Informed search algorithms and multi-goal heuristics for Lab 5.
-# Does NOT modify existing project files. Safe to drop into src/ and import.
+# No imports from any heuristics module; heuristics are defined here.
 # ---------------------------------------------------------------------
 
 from __future__ import annotations
-from typing import Callable, Dict, Iterable, List, Optional, Tuple
+from typing import Callable, Dict, Iterable, List, Tuple
 from dataclasses import dataclass, field
 import heapq
 import math
@@ -13,22 +13,23 @@ import math
 from src.problemClass import Problem
 from src.nodeClass import Node
 
-State = Tuple[int, int]  # Maze states are (row, col) tuples in your codebase.
-
+State = Tuple[int, int]  # (row, col)
 
 # ============================== Heuristics ==============================
+
 
 def euclidean(a: State, b: State) -> float:
     return math.dist(a, b)
 
+
 def manhattan(a: State, b: State) -> float:
-    return abs(a[0]-b[0]) + abs(a[1]-b[1])
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
 
 # ============================== Utilities ===============================
 
+
 def _reconstruct(node: Node) -> Tuple[List[State], List]:
-    """Return (states, actions) from root to this node."""
     states: List[State] = []
     actions: List = []
     n = node
@@ -42,6 +43,7 @@ def _reconstruct(node: Node) -> Tuple[List[State], List]:
         actions = actions[1:]
     return states, actions
 
+
 def _expand(problem: Problem, node: Node) -> Iterable[Node]:
     for a in problem.actions(node.state):
         s2 = problem.result(node.state, a)
@@ -49,10 +51,22 @@ def _expand(problem: Problem, node: Node) -> Iterable[Node]:
         yield Node(s2, parent=node, action=a, path_cost=g2)
 
 
+def _on_path(node: Node, state: State) -> bool:
+    n = node
+    while n is not None:
+        if n.state == state:
+            return True
+        n = n.parent
+    return False
+
+
 # ============================ A* (generic) ==============================
 
-def astar_search(problem: Problem, h: Callable[[State], float]) -> Tuple[List[State], List, int, float]:
-    """Generic A* graph search. Returns (path_states, path_actions, nodes_expanded, total_cost)."""
+
+def astar_search(
+    problem: Problem, h: Callable[[State], float]
+) -> Tuple[List[State], List, int, float]:
+    """Generic A*. Returns (path_states, path_actions, nodes_expanded, total_cost)."""
     start = Node(problem.initial, path_cost=0, parent=None, action=None)
     nodes_expanded = 0
 
@@ -86,26 +100,30 @@ def astar_search(problem: Problem, h: Callable[[State], float]) -> Tuple[List[St
 
 # ========================= A* concrete variants ========================
 
+
 def astar_euclidean(problem: Problem) -> Tuple[List[State], List, int, float]:
-    """A* using Euclidean distance to a single (or first) goal."""
     goal = problem.goal if not isinstance(problem.goal, list) else problem.goal[0]
     return astar_search(problem, lambda s: euclidean(s, goal))
 
+
 def astar_manhattan(problem: Problem) -> Tuple[List[State], List, int, float]:
-    """A* using Manhattan distance to a single (or first) goal."""
     goal = problem.goal if not isinstance(problem.goal, list) else problem.goal[0]
     return astar_search(problem, lambda s: manhattan(s, goal))
 
 
 # ================================ IDA* ==================================
 
+
 @dataclass(order=True)
 class _IDAFrame:
     f: float
     node: Node = field(compare=False)
 
-def ida_star(problem: Problem, h: Callable[[State], float]) -> Tuple[List[State], List, int, float]:
-    """Iterative Deepening A* (IDA*). Returns (states, actions, nodes_expanded, total_cost)."""
+
+def ida_star(
+    problem: Problem, h: Callable[[State], float]
+) -> Tuple[List[State], List, int, float]:
+    """IDA*. Returns (states, actions, nodes_expanded, total_cost)."""
     start = Node(problem.initial, path_cost=0, parent=None, action=None)
     bound = h(start.state)
     nodes_expanded = 0
@@ -119,6 +137,9 @@ def ida_star(problem: Problem, h: Callable[[State], float]) -> Tuple[List[State]
             return node, f
         min_next = float("inf")
         for child in _expand(problem, node):
+            # Path-based cycle pruning (prevents recursion blow-ups)
+            if _on_path(node, child.state):
+                continue
             nodes_expanded += 1
             found, t = search(child, child.path_cost, bound)
             if found is not None:
@@ -139,23 +160,26 @@ def ida_star(problem: Problem, h: Callable[[State], float]) -> Tuple[List[State]
 
 # ========================== Multi-goal heuristics =======================
 
-def make_multigoal_heuristic(foods: List[State], final_goal: State) -> Callable[[State], float]:
+
+def make_multigoal_heuristic(
+    foods: List[State], final_goal: State
+) -> Callable[[State], float]:
     """
-    Admissible lower bound for: collect all foods first, then go to final_goal.
-    Uses distance to nearest food (Manhattan), or if no foods remain, distance to final_goal.
+    Admissible lower bound: distance to nearest remaining food (Manhattan),
+    or if none remain, distance to final_goal.
     """
     foods_set = set(foods)
+
     def h(state: State) -> float:
         if foods_set:
             return min(manhattan(state, f) for f in foods_set)
         return manhattan(state, final_goal)
+
     return h
 
+
 def mst_lower_bound(points: List[State]) -> float:
-    """
-    Optional tighter lower bound: MST cost over a set of points using Manhattan distance.
-    Kruskal with all-pairs edges. Safe to use as a heuristic add-on for remaining foods.
-    """
+    """MST over points using Manhattan distance (admissible LB)."""
     if not points:
         return 0.0
 
@@ -182,7 +206,7 @@ def mst_lower_bound(points: List[State]) -> float:
 
     edges = []
     for i in range(len(points)):
-        for j in range(i+1, len(points)):
+        for j in range(i + 1, len(points)):
             d = manhattan(points[i], points[j])
             edges.append((d, i, j))
     edges.sort(key=lambda x: x[0])
@@ -193,16 +217,18 @@ def mst_lower_bound(points: List[State]) -> float:
             cost += d
     return cost
 
-def make_multigoal_heuristic_mst(foods: List[State], final_goal: State) -> Callable[[State], float]:
-    """
-    Even tighter admissible heuristic:
-    nearest-food distance + MST over remaining foods (ignores final_goal for a lower bound).
-    """
+
+def make_multigoal_heuristic_mst(
+    foods: List[State], final_goal: State
+) -> Callable[[State], float]:
+    """nearest-food + MST(foods) lower bound (tighter, still admissible)."""
     foods_list = list(foods)
+
     def h(state: State) -> float:
         if foods_list:
             d0 = min(manhattan(state, f) for f in foods_list)
-            d_mst = mst_lower_bound(foods_list)
+            d_mst = mst_lower_bound(foods_list) if len(foods_list) > 1 else 0.0
             return d0 + d_mst
         return manhattan(state, final_goal)
+
     return h
