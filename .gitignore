@@ -1,2 +1,19 @@
 # Ignore Python virtual environments
 .venv/
+venv/
+venv
+env/
+
+.env/
+ENV/
+.python-env/
+.conda/
+.conda_env/
+pipenv/
+Pipfile.lock
+
+# Sometimes venv is created in subfolders:
+**/.venv/
+**/venv/
+**/env/
+**/.env/
