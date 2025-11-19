@@ -83,7 +83,7 @@ def back_revise(csp, Xi, Xj, checks=0):
     return revised, checks
 
 
-# CSP Backtracking Search
+# CSP Backtracking Search Section
 # Variable ordering
 def first_unassigned_variable(assignment, csp):
     """The default variable order."""
