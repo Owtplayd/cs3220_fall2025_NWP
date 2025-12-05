@@ -1,13 +1,4 @@
 class Node:
-    """A node in a search tree. 
-    Contains a pointer to the parent (the node that this is a successor of) 
-    and to the actual state for this node. 
-    !!! Note that if a state is arrived at by two paths, then there are two nodes with
-    the same state. 
-    Also includes the action that got us to this state, 
-    and  the total path_cost (also known as g) to reach the node. 
-    You will not need to     subclass this class."""
-
     def __init__(self, state, parent=None, action=None, path_cost=0):
         """Create a search tree Node, derived from a parent by an action."""
         self.state = state
@@ -30,10 +21,12 @@ class Node:
     '''
     def expand(self, problem):
         """List the nodes reachable in one step from this node."""
+        print(problem.actions(self.state))
         return [self.child_node(problem, action)
                 for action in problem.actions(self.state)]
 
     def child_node(self, problem, action):
+        print(self.state)
         #using the RESULT function to see where those actions lead to
         next_state = problem.result(self.state, action)
         # and generating a new node (called a child node)
